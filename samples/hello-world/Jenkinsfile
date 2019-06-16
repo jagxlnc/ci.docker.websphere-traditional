@@ -41,7 +41,6 @@ podTemplate(label: 'icp-was-build-1', serviceAccount: serviceAccount, namespace:
         stage ('deploy') {
           container('helm') {
             sh """
-            cd samples/hello-world
             helm init --skip-refresh --client-only
             helm repo add ibm-charts https://raw.githubusercontent.com/IBM/charts/master/repo/stable/ 
             helm repo list
