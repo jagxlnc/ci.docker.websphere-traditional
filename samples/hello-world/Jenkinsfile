@@ -27,6 +27,7 @@ podTemplate(label: 'icp-was-build-1', serviceAccount: serviceAccount, namespace:
             def imageTag = "mycluster.icp:8500/default/wastest:${gitCommit}"
             echo "imageTag ${imageTag}"
             sh """
+            cd samples/hello-world
             ln -s /msb_reg_sec/.dockercfg /home/jenkins/.dockercfg
             mkdir /home/jenkins/.docker
             ln -s /msb_reg_sec/.dockerconfigjson /home/jenkins/.docker/config.json
@@ -40,6 +41,7 @@ podTemplate(label: 'icp-was-build-1', serviceAccount: serviceAccount, namespace:
         stage ('deploy') {
           container('helm') {
             sh """
+            cd samples/hello-world
             helm init --skip-refresh --client-only
             helm repo add ibm-charts https://raw.githubusercontent.com/IBM/charts/master/repo/stable/ 
             helm repo list
