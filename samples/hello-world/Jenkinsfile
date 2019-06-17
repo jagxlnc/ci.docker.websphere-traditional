@@ -40,6 +40,7 @@ podTemplate(label: 'icp-was-build-1', serviceAccount: serviceAccount, namespace:
             container('kubectl') {
                echo " Create ConfigMap..."
                 sh """
+                cd samples/hello-world
                 kubectl apply -f deploy/config-map.yaml
                 """
             }
