@@ -38,8 +38,10 @@ podTemplate(label: 'icp-was-build-1', serviceAccount: serviceAccount, namespace:
         }
         stage ('Configure') {
             container('kubectl') {
-               echo " Create ConfigMap..." 
+               echo " Create ConfigMap..."
+                sh """
                 kubectl apply -f deploy/config-map.yaml
+                """
             }
         }
         stage ('Deploy using Helm') {
