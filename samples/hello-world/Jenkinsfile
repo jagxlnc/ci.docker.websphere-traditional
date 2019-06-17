@@ -22,7 +22,7 @@ podTemplate(label: 'icp-was-build-1', serviceAccount: serviceAccount, namespace:
             echo "checked out git commit ${gitCommit}"
             stash excludes: 'target/', name: 'source'
         }
-        stage ('docker') {
+        stage ('Docker') {
           container('docker') {
             def imageTag = "mycluster.icp:8500/default/wastest:${gitCommit}"
             echo "imageTag ${imageTag}"
@@ -36,14 +36,20 @@ podTemplate(label: 'icp-was-build-1', serviceAccount: serviceAccount, namespace:
             """
           }
         }
-        stage ('deploy') {
+        stage ('Configure') {
+            container('kubectl') {
+               echo " Create ConfigMap..." 
+                kubectl apply -f deploy/config-map.yaml
+            }
+        }
+        stage ('Deploy using Helm') {
           container('helm') {
             sh """
             cd samples/hello-world
             helm init --skip-refresh --client-only
             helm repo add ibm-charts https://raw.githubusercontent.com/IBM/charts/master/repo/stable/ 
             helm repo list
-            helm install ibm-charts/ibm-websphere-traditional -f hello-world-values.yaml --name my-was-app --set image.tag=${gitCommit} --tls --tls-ca-cert=/msb_helm_sec/ca.pem --tls-cert=/msb_helm_sec/cert.pem --tls-key=/msb_helm_sec/key.pem
+            helm upgrade --install --wait --values deploy/hello-world-values.yaml  my-was-ap ibm-charts/ibm-websphere-traditional --set image.tag=${gitCommit} --tls --tls-ca-cert=/msb_helm_sec/ca.pem --tls-cert=/msb_helm_sec/cert.pem --tls-key=/msb_helm_sec/key.pem
             """  
         } 
     }
